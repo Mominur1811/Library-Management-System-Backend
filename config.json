@@ -1,0 +1,14 @@
+{
+    "mode": "update",
+    "service_name": "library-management-system",
+    "http_port": 3000,
+    "jwt_secrect_key": "wednesday",
+    "db": {
+        "host": "localhost",
+        "port": "5432",
+        "dbName": "LibraryManagement",
+        "sslMode": "disable",
+        "password": "admin",
+        "user": "root"
+    }
+}
