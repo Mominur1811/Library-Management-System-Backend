@@ -91,6 +91,13 @@ func InitRoutes(mux *http.ServeMux, manager *middlewire.Manager) {
 	)
 
 	mux.Handle(
+		"DELETE /admin/delete-request",
+		manager.With(
+			http.HandlerFunc(handlers.DeleteBorrowRequest), middlewire.AuthenticateAdmin,
+		),
+	)
+
+	mux.Handle(
 		"GET /reader/searchbook",
 		manager.With(
 			http.HandlerFunc(handlers.SearchBook), middlewire.AuthenticateUser,
@@ -114,7 +121,7 @@ func InitRoutes(mux *http.ServeMux, manager *middlewire.Manager) {
 	mux.Handle(
 		"GET /admin/borrowedbook",
 		manager.With(
-			http.HandlerFunc(handlers.FetchBorrowStatus), middlewire.AuthenticateUser,
+			http.HandlerFunc(handlers.FetchBorrowStatus), middlewire.AuthenticateAdmin,
 		),
 	)
 
@@ -140,6 +147,13 @@ func InitRoutes(mux *http.ServeMux, manager *middlewire.Manager) {
 	)
 
 	mux.Handle(
+		"GET /admin/user-history",
+		manager.With(
+			http.HandlerFunc(handlers.UserHistory), middlewire.AuthenticateAdmin,
+		),
+	)
+
+	mux.Handle(
 		"PATCH /reader/updatereadprogress",
 		manager.With(
 			http.HandlerFunc(handlers.UserReadProgressUpdate), middlewire.AuthenticateUser,
@@ -157,6 +171,13 @@ func InitRoutes(mux *http.ServeMux, manager *middlewire.Manager) {
 		"GET /reader/userinfo",
 		manager.With(
 			http.HandlerFunc(handlers.UserInfo), middlewire.AuthenticateUser,
+		),
+	)
+
+	mux.Handle(
+		"GET /admin/user-info",
+		manager.With(
+			http.HandlerFunc(handlers.UserInfo), middlewire.AuthenticateAdmin,
 		),
 	)
 }

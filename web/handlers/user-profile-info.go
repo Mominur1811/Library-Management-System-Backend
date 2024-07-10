@@ -1,19 +1,23 @@
 package handlers
 
 import (
+	"fmt"
 	"librarymanagement/db"
-	"librarymanagement/web/middlewire"
+	"librarymanagement/logger"
 	"librarymanagement/web/utils"
+	"log/slog"
 	"net/http"
 )
 
-
-
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
-	userId, err := middlewire.GetUserId(r)
+	userId, err := getUserId(r)
 	if err != nil {
-		utils.SendError(w, http.StatusExpectationFailed, err.Error())
+		slog.Error("Failed to get user id", logger.Extra(map[string]any{
+			"error":   err.Error(),
+			"payload": userId,
+		}))
+		utils.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -22,9 +26,9 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		utils.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	fmt.Println(user)
 	utils.SendData(w, map[string]interface{}{
 		"username": user.Name,
-		"email": user.Email,
+		"email":    user.Email,
 	})
 }

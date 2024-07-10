@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"librarymanagement/db"
 	"librarymanagement/logger"
 	"librarymanagement/web/utils"
@@ -20,7 +19,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		utils.SendError(w, http.StatusPreconditionFailed, err.Error())
 		return
 	}
-	fmt.Println(updatedBookInfo)
+
 	if err := utils.ValidateStruct(updatedBookInfo); err != nil {
 		slog.Error("Failed to validate new book data", logger.Extra(map[string]any{
 			"error":   err.Error(),
@@ -30,8 +29,17 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedBookInfo.Id = getBookId(r.PathValue("id"))
 	var err error
+	updatedBookInfo.Id, err = convIntToString(r.PathValue("id"))
+	if err != nil {
+		slog.Error("can found book it in the path", logger.Extra(map[string]any{
+			"error":   err.Error(),
+			"payload": updatedBookInfo.Id,
+		}))
+		utils.SendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	if err = db.GetBookRepo().UpdateBook(&updatedBookInfo); err != nil {
 		utils.SendError(w, http.StatusInternalServerError, err.Error())
 		return

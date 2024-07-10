@@ -36,6 +36,40 @@ type BorrowHistory struct {
 	Requestdate   *time.Time `db:"created_at"         json:"created_at"`
 }
 
+// Delete borrow request
+
+func (r *BookRequestRepo) DeleteBorrowRequest(id int) error {
+
+	delQry, args, err := GetQueryBuilder().Delete(r.Table).Where(sq.Eq{"request_id": id}).ToSql()
+	if err != nil {
+		slog.Error(
+			"Failed to create delete query of borrow request",
+			logger.Extra(map[string]any{
+				"error": err.Error(),
+				"query": delQry,
+				"args":  args,
+			}),
+		)
+		return err
+	}
+	fmt.Println(delQry, args)
+	_, err = GetReadDB().Exec(delQry, args...)
+	if err != nil {
+		slog.Error(
+			"Failed to delete borrow request",
+			logger.Extra(map[string]any{
+				"error": err.Error(),
+				"query": delQry,
+				"args":  args,
+			}),
+		)
+		return err
+	}
+
+	return nil
+
+}
+
 // Push borrow request
 func (r *BookRequestRepo) PushBorrowRequest(requestBook *BorrowRequest) (*BorrowRequest, error) {
 
@@ -52,7 +86,7 @@ func (r *BookRequestRepo) PushBorrowRequest(requestBook *BorrowRequest) (*Borrow
 		values = append(values, columnValue)
 	}
 	qry, args, err := GetQueryBuilder().
-		Insert("borrow_history").
+		Insert(r.Table).
 		Columns(columns...).
 		Suffix(`
 			RETURNING
@@ -78,7 +112,6 @@ func (r *BookRequestRepo) PushBorrowRequest(requestBook *BorrowRequest) (*Borrow
 		return nil, err
 	}
 
-	fmt.Println(qry)
 	var insRequest BorrowRequest
 	err = GetReadDB().QueryRow(qry, args...).Scan(&insRequest.RequestId, &insRequest.BookId, &insRequest.BorrowerId, &insRequest.IssuedAt, &insRequest.ReturnedAt, &insRequest.ReadPage, &insRequest.BorrowStatus)
 	if err != nil {
@@ -235,7 +268,6 @@ func (r *BookRequestRepo) GetBorrowHistory(params utils.PaginationParams) ([]*Bo
 	}
 
 	qry, args, err := query.ToSql()
-	fmt.Println(qry, args)
 
 	if err != nil {
 		slog.Error(
