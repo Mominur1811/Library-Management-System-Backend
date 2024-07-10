@@ -35,7 +35,7 @@ func ApprovedBookRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.GetBookRepo().UpdateBookAvailability(reqId.Book_Id); err != nil {
+	if err := db.GetBookRepo().UpdateBookStock(reqId.Book_Id); err != nil {
 		utils.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

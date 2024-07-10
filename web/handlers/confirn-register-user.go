@@ -2,23 +2,38 @@ package handlers
 
 import (
 	"encoding/json"
+	"librarymanagement/db"
 	"librarymanagement/logger"
 	"librarymanagement/web/utils"
 	"log/slog"
 	"net/http"
 )
 
-func AcceptRegistration(w http.ResponseWriter, r *http.Request) {
+func ApprovedUser(w http.ResponseWriter, r *http.Request) {
 
-	var email string
-	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
-		slog.Error("Failed to decode email data", logger.Extra(map[string]any{
+	var eAdd Email
+	if err := json.NewDecoder(r.Body).Decode(&eAdd); err != nil {
+		slog.Error("Failed to decode new user data", logger.Extra(map[string]any{
 			"error":   err.Error(),
-			"payload": email,
+			"payload": eAdd,
 		}))
 		utils.SendError(w, http.StatusPreconditionFailed, err.Error())
 		return
 	}
 
-	//if err := db.GetAdminRepo().ConfirmRegistratio
+	if err := utils.ValidateStruct(eAdd); err != nil {
+		slog.Error("Failed to validate new book data", logger.Extra(map[string]any{
+			"error":   err.Error(),
+			"payload": eAdd,
+		}))
+		utils.SendError(w, http.StatusExpectationFailed, err.Error())
+		return
+	}
+
+	if err := db.GetReaderRepo().ApprovedReader(eAdd.Address); err != nil {
+		utils.SendError(w, http.StatusPreconditionFailed, err.Error())
+		return
+	}
+
+	utils.SendData(w, "Succeed")
 }

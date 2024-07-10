@@ -372,7 +372,7 @@ func (r *BookRepo) BuildCntQuery(params utils.PaginationParams) sq.SelectBuilder
 	return query
 }
 
-func (r *BookRepo) UpdateBookAvailability(bookId int) error {
+func (r *BookRepo) UpdateBookStock(bookId int) error {
 
 	updateQry, args, err := GetQueryBuilder().Update(r.Table).
 		Set("available", sq.Expr("available - 1")).

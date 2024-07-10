@@ -20,7 +20,6 @@ type Request struct {
 	RequestStatus  string     `db:"request_status"   json:"request_status"`
 }
 
-
 type BookRequestRepo struct {
 	Table string
 }
@@ -28,17 +27,16 @@ type BookRequestRepo struct {
 var bookRequestRepo *BookRequestRepo
 
 func InitBookReqeustRepo() {
-	bookRequestRepo = &BookRequestRepo{Table: "book_request"}
+	bookRequestRepo = &BookRequestRepo{Table: "borrow_history"}
 }
 
 func GetBookRequestRepo() *BookRequestRepo {
 	return bookRequestRepo
 }
 
-
 func (r *BookRequestRepo) ChangeBorrowStatus(reqId int, updatedStatus string) error {
 
-	updateQry, args, err := GetQueryBuilder().Update("borrow_history").
+	updateQry, args, err := GetQueryBuilder().Update(r.Table).
 		Set("borrow_status", updatedStatus).
 		Set("issued_at", time.Now()).
 		Where(sq.Eq{"request_id": reqId}).
@@ -71,7 +69,6 @@ func (r *BookRequestRepo) ChangeBorrowStatus(reqId int, updatedStatus string) er
 
 	return nil
 }
-
 
 func (r *BookRequestRepo) GetBorrowedBooks() ([]*Request, error) {
 
@@ -112,7 +109,7 @@ func (r *BookRequestRepo) GetBorrowedBooks() ([]*Request, error) {
 
 func (r *BookRequestRepo) UpdateUserReadProgress(reqId int, read_today int) error {
 
-	updateQry, args, err := GetQueryBuilder().Update("borrow_history").
+	updateQry, args, err := GetQueryBuilder().Update(r.Table).
 		Set("read_page", sq.Expr(fmt.Sprintf("read_page + %d", read_today))).
 		Where(sq.Eq{"request_id": reqId}).
 		ToSql()
@@ -151,7 +148,7 @@ func (r *BookRequestRepo) ValidateUserBorrowRequest(req *BorrowRequest) error {
 
 	fmt.Println(req)
 	qry, args, err := GetQueryBuilder().Select("COUNT(*)").
-		From("borrow_history").
+		From(r.Table).
 		Where(sq.Eq{"borrower_id": req.BorrowerId}).Where(sq.Eq{"book_id": req.BookId}).
 		Where(sq.Or{
 			sq.Eq{"borrow_status": "Approved"},
