@@ -8,4 +8,5 @@ func InitDB() {
 	InitBookRepo()
 	InitBookReqeustRepo()
 	InitAdminRepo()
+	InitCategoryRepo()
 }

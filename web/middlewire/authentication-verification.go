@@ -109,9 +109,9 @@ func ExtractToken(header string) (string, error) {
 	if len(header) == 0 {
 		return "", fmt.Errorf("access token is null ")
 	}
-
 	//Check and Extract jwt part
 	tokens := strings.Split(header, " ")
+	
 	if len(tokens) != 2 {
 		return "", fmt.Errorf("access token structure is invalid ")
 	}

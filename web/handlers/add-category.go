@@ -9,31 +9,31 @@ import (
 	"net/http"
 )
 
-func AddBook(w http.ResponseWriter, r *http.Request) {
-	var newBook db.Book
-	if err := json.NewDecoder(r.Body).Decode(&newBook); err != nil {
+func AddCategory(w http.ResponseWriter, r *http.Request) {
+	var newCategory db.Category
+	if err := json.NewDecoder(r.Body).Decode(&newCategory); err != nil {
 		slog.Error("Failed to decode new user data", logger.Extra(map[string]any{
 			"error":   err.Error(),
-			"payload": newBook,
+			"payload": newCategory,
 		}))
 		utils.SendError(w, http.StatusPreconditionFailed, err.Error())
 		return
 	}
-	if err := utils.ValidateStruct(newBook); err != nil {
+	if err := utils.ValidateStruct(newCategory); err != nil {
 		slog.Error("Failed to validate new book data", logger.Extra(map[string]any{
 			"error":   err.Error(),
-			"payload": newBook,
+			"payload": newCategory,
 		}))
 		utils.SendError(w, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var err error
-	var insBook *db.Book
-	if insBook, err = db.GetBookRepo().InsertBook(&newBook); err != nil {
+	var insCategory *db.Category
+	if insCategory, err = db.GetCategoryRepo().InsertCategory(&newCategory); err != nil {
 		utils.SendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	utils.SendData(w, insBook)
+	utils.SendData(w, insCategory)
 }

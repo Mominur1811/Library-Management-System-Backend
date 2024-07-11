@@ -3,6 +3,7 @@ package handlers
 import (
 	"librarymanagement/db"
 	"librarymanagement/web/utils"
+	"log"
 	"net/http"
 )
 
@@ -14,6 +15,8 @@ const (
 func SearchBook(w http.ResponseWriter, r *http.Request) {
 
 	param := utils.GetPaginationParams(r, defaultSortBy, defaultSortOrder)
+
+	log.Println(param)
 
 	booklist, err := db.GetBookRepo().GetBookList(param)
 	if err != nil {

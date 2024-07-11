@@ -307,8 +307,8 @@ func (r *BookRepo) BuildFilterQuery(params utils.PaginationParams) sq.SelectBuil
 		likePattern := fmt.Sprintf("%%%s%%", params.Search)
 		query = query.Where(
 			sq.Or{
-				sq.Like{"title": likePattern},
-				sq.Like{"author": likePattern},
+				sq.ILike{"title": likePattern},
+				sq.ILike{"author": likePattern},
 			},
 		)
 	}
