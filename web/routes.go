@@ -180,4 +180,18 @@ func InitRoutes(mux *http.ServeMux, manager *middlewire.Manager) {
 			http.HandlerFunc(handlers.UserInfo), middlewire.AuthenticateAdmin,
 		),
 	)
+
+	mux.Handle(
+		"GET /category-list",
+		manager.With(
+			http.HandlerFunc(handlers.FetchCategory),
+		),
+	)
+
+	mux.Handle(
+		"POST /admin/add-category",
+		manager.With(
+			http.HandlerFunc(handlers.AddCategory), middlewire.AuthenticateAdmin,
+		),
+	)
 }
